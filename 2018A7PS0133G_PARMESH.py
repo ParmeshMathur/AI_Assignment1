@@ -1,4 +1,43 @@
+from numpy.core.fromnumeric import size
 from CNF_Creator import *
+import numpy as np
+import copy
+
+def fitness_func():
+    val = 0
+    return val
+
+def reproduce():
+    # x = random selection from narr
+    # y = random selection from narr that is not x
+    # n = random length from 0 to len(x)
+    # append beginning substring of x to ending one of y
+    child = np.array([1,2,3,4,5,6,7,8,9,10])
+    return child
+
+def gen_algo_basic():
+    # generate numpy array of 20 arrays
+    narr = np.empty([20,50], dtype = int)
+    n=20
+    # generate 20 different states in narr
+    opt_sol = np.empty(50, dtype = int)
+    while True:
+        newnarr = np.empty(shape = narr.shape, dtype = int)
+        for i in range(n):
+            print(i)
+            # x = random selection from narr
+            # y = random selection from narr that is not x
+            # child = reproduce(x,y)
+            # with some random prob, mutate child
+            # append child to newnarr
+        # narr = copy.copy(newnarr)
+        
+        for i in range(n):
+            if(fitness_func(narr[i]) == 100 ):
+                return narr[i]
+            if(fitness_func(narr[i]) > fitness_func(opt_sol)):
+                opt_sol = copy.copy(narr[i])
+    return opt_sol
 
 
 def main():
