@@ -1,3 +1,4 @@
+from random import randint
 from numpy.core.fromnumeric import size
 from CNF_Creator import *
 import numpy as np
@@ -7,36 +8,49 @@ def fitness_func():
     val = 0
     return val
 
-def reproduce():
-    # x = random selection from narr
-    # y = random selection from narr that is not x
-    # n = random length from 0 to len(x)
+def mutate(child):
+    ind = randint(0,len(child)-1)
+    child[ind]*=-1
+
+def reproduce(xarr, yarr):
+    n = randint(0,len(xarr)-1)
     # append beginning substring of x to ending one of y
-    child = np.array([1,2,3,4,5,6,7,8,9,10])
+    xtemp = xarr[:n]
+    ytemp = yarr[n:]
+    child = np.concatenate(xtemp, ytemp)
+
+    # with some random prob, mutate child
+    prob = randint(0,9)
+    if prob==0:
+        mutate(child)
+
     return child
 
 def gen_algo_basic():
     # generate numpy array of 20 arrays
     narr = np.empty([20,50], dtype = int)
-    n=20
-    # generate 20 different states in narr
+    # generate first 20 different random states in narr
     opt_sol = np.empty(50, dtype = int)
     while True:
-        newnarr = np.empty(shape = narr.shape, dtype = int)
-        for i in range(n):
+        n=0
+        newnarr = np.empty(dtype = int)
+        for i in range(20):
             print(i)
-            # x = random selection from narr
-            # y = random selection from narr that is not x
-            # child = reproduce(x,y)
-            # with some random prob, mutate child
+            x = randint(0,len(narr)-1)
+            y = randint(0,len(narr)-1)
+            while y==x:
+                y = randint(0,len(narr)-1)
+            child = reproduce(narr[x],narr[y])
             # append child to newnarr
-        # narr = copy.copy(newnarr)
+            newnarr = newnarr.append(child)
+        narr = newnarr.copy()
         
         for i in range(n):
             if(fitness_func(narr[i]) == 100 ):
                 return narr[i]
             if(fitness_func(narr[i]) > fitness_func(opt_sol)):
-                opt_sol = copy.copy(narr[i])
+                opt_sol = narr[i].copy()
+        n+=1
     return opt_sol
 
 
