@@ -8,13 +8,22 @@ import sys
 import os
 import threading
 
+# TODO: put everthing in a class
+
 def timelimit():
     time.sleep(45)
     # print best model
     os._exit(1)
 
-def fitness_func(sentence):
-    val = 0
+def fitness_func(sentence, model):
+    sat = 0
+    m = len(sentence)
+    for i in range(m):
+        for j in range(3):
+            if sentence[i][j] * model[abs(sentence[i][j])-1] > 0:
+                sat += 1
+                break
+    val = (sat/m)*100
     return val
 
 def mutate(child):
@@ -28,20 +37,20 @@ def reproduce(xarr, yarr):
     ytemp = yarr[n:]
     child = np.concatenate(xtemp, ytemp)
 
-    # with some random prob, mutate child
+    # with some random prob (1 in 10), mutate child
     prob = randint(0,9)
     if prob==0:
         mutate(child)
 
     return child
 
-def gen_algo_basic():
+def gen_algo_basic(sentence):
     # generate numpy array of 20 arrays
     narr = np.empty([20,50], dtype = int)
-    # generate first 20 different random states in narr
+    # TODO: generate first 20 different random states in narr
     opt_sol = np.empty(50, dtype = int)
     while True:
-        n=0
+        n=0 # number of iterations. To be used in code to check stagnation
         newnarr = np.empty(dtype = int)
         for i in range(20):
             print(i)
@@ -50,23 +59,24 @@ def gen_algo_basic():
             while y==x:
                 y = randint(0,len(narr)-1)
             child = reproduce(narr[x],narr[y])
-            # append child to newnarr
+            # TODO: append child to newnarr
             newnarr = newnarr.append(child)
         narr = newnarr.copy()
         
-        for i in range(n):
-            if(fitness_func(narr[i]) == 100 ):
+        for i in range(len(narr)):
+            if(fitness_func(sentence, narr[i]) == 100 ):
                 return narr[i]
-            if(fitness_func(narr[i]) > fitness_func(opt_sol)):
+            if(fitness_func(sentence, narr[i]) > fitness_func(sentence, opt_sol)):
                 opt_sol = narr[i].copy()
         n+=1
+        # TODO: check if algo has stagnated
     return opt_sol
 
 
 def main():
     cnfC = CNF_Creator(n=50) # n is number of symbols in the 3-CNF sentence
     sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
-    # also do for m = 160, 200, 240, 300
+    # TODO: also do for m = 160, 200, 240, 300
     print('Random sentence : ',sentence)
 
     sentence = cnfC.ReadCNFfromCSVfile()
