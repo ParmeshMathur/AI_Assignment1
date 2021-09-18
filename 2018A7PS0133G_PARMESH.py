@@ -3,8 +3,17 @@ from numpy.core.fromnumeric import size
 from CNF_Creator import *
 import numpy as np
 import copy
+import time
+import sys
+import os
+import threading
 
-def fitness_func():
+def timelimit():
+    time.sleep(45)
+    # print best model
+    os._exit(1)
+
+def fitness_func(sentence):
     val = 0
     return val
 
@@ -57,6 +66,7 @@ def gen_algo_basic():
 def main():
     cnfC = CNF_Creator(n=50) # n is number of symbols in the 3-CNF sentence
     sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
+    # also do for m = 160, 200, 240, 300
     print('Random sentence : ',sentence)
 
     sentence = cnfC.ReadCNFfromCSVfile()
