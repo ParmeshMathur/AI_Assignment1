@@ -7,6 +7,7 @@ import time
 import sys
 import os
 import threading
+from collections import deque
 
 # TODO: put everthing in a class
 
@@ -29,6 +30,7 @@ def fitness_func(sentence, model):
 def mutate(child):
     ind = randint(0,len(child)-1)
     child[ind]*=-1
+    return child
 
 def reproduce(xarr, yarr):
     n = randint(0,len(xarr)-1)
@@ -40,37 +42,52 @@ def reproduce(xarr, yarr):
     # with some random prob (1 in 10), mutate child
     prob = randint(0,9)
     if prob==0:
-        mutate(child)
+        child = mutate(child)
 
     return child
 
-def gen_algo_basic(sentence):
-    # generate numpy array of 20 arrays
-    narr = np.empty([20,50], dtype = int)
-    # TODO: generate first 20 different random states in narr
+class basicGA:
     opt_sol = np.empty(50, dtype = int)
-    while True:
-        n=0 # number of iterations. To be used in code to check stagnation
-        newnarr = np.empty(dtype = int)
-        for i in range(20):
-            print(i)
-            x = randint(0,len(narr)-1)
-            y = randint(0,len(narr)-1)
-            while y==x:
+    def gen_algo_basic(self,sentence):
+        # generate numpy array of 20 arrays
+        narr = np.empty([20,50], dtype = int)
+        best_fit = np.empty(50, dtype = int)
+        fitness = np.empty(50, dtype = float)
+        stagfact = 0
+        # TODO: generate first 20 different random states in narr
+        while True:
+            n=0 # number of iterations. To be used in code to check stagnation
+            newnarr = np.empty(dtype = int)
+            for i in range(20):
+                print(i)
+                x = randint(0,len(narr)-1)
                 y = randint(0,len(narr)-1)
-            child = reproduce(narr[x],narr[y])
-            # TODO: append child to newnarr
-            newnarr = newnarr.append(child)
-        narr = newnarr.copy()
-        
-        for i in range(len(narr)):
-            if(fitness_func(sentence, narr[i]) == 100 ):
-                return narr[i]
-            if(fitness_func(sentence, narr[i]) > fitness_func(sentence, opt_sol)):
-                opt_sol = narr[i].copy()
-        n+=1
-        # TODO: check if algo has stagnated
-    return opt_sol
+                while y==x:
+                    y = randint(0,len(narr)-1)
+                child = reproduce(narr[x],narr[y])
+                # append child to newnarr
+                temp = len(newnarr)
+                newnarr = np.insert(newnarr, temp, child, axis=0)
+            narr = newnarr.copy()
+            
+            for i in range(len(narr)):
+                if(fitness_func(sentence, narr[i]) == 100 ):
+                    return narr[i]
+                if(fitness_func(sentence, narr[i]) > fitness_func(sentence, best_fit)):
+                    best_fit = narr[i].copy()
+            if(fitness_func(sentence, best_fit) > fitness_func(sentence, self.opt_sol)):
+                self.opt_sol = best_fit.copy()
+            n+=1
+            n%=50
+            # check if algo has stagnated
+            if abs(fitness[n]-fitness_func(sentence, best_fit))<=1:
+                if stagfact >=50:
+                    break
+                else:
+                    stagfact += 1
+            else:
+                stagfact = max(0, stagfact-5)
+        return self.opt_sol
 
 
 def main():
