@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, sample
 from numpy.core.fromnumeric import size
 from CNF_Creator import *
 import numpy as np
@@ -10,11 +10,6 @@ import threading
 from collections import deque
 
 # TODO: put everthing in a class
-
-def timelimit():
-    time.sleep(45)
-    # print best model
-    os._exit(1)
 
 def fitness_func(sentence, model):
     sat = 0
@@ -34,10 +29,15 @@ def mutate(child):
 
 def reproduce(xarr, yarr):
     n = randint(0,len(xarr)-1)
-    # append beginning substring of x to ending one of y
-    xtemp = xarr[:n]
-    ytemp = yarr[n:]
-    child = np.concatenate(xtemp, ytemp)
+    o = randint(0,1)
+    # append beginning substring of one to ending one of another
+    if(o==1):
+        xtemp = xarr[:n]
+        ytemp = yarr[n:]
+    else:
+        xtemp = yarr[:n]
+        ytemp = xarr[n:]
+    child = np.concatenate((xtemp, ytemp))
 
     # with some random prob (1 in 10), mutate child
     prob = randint(0,9)
@@ -46,8 +46,24 @@ def reproduce(xarr, yarr):
 
     return child
 
+def randomGenerate(n):
+    ones = np.ones(n, dtype=int)
+    narr = []
+    # for i in range(20):
+    # c = randint(1,n)
+    # ind = sample(range(1,n), c)
+    # arr = ones.copy()
+    # for j in ind:
+    # arr[j] = -1
+
 class basicGA:
     opt_sol = np.empty(50, dtype = int)
+    
+    def timelimit(self):
+        time.sleep(45)
+        print(self.opt_sol)
+        # os._exit(1)
+
     def gen_algo_basic(self,sentence):
         # generate numpy array of 20 arrays
         narr = np.empty([20,50], dtype = int)
