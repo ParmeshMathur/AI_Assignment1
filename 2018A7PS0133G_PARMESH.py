@@ -9,8 +9,6 @@ import os
 import threading
 from collections import deque
 
-# TODO: put everthing in a class
-
 def fitness_func(sentence, model):
     sat = 0
     m = len(sentence)
@@ -49,31 +47,43 @@ def reproduce(xarr, yarr):
 def randomGenerate(n):
     ones = np.ones(n, dtype=int)
     narr = []
-    # for i in range(20):
-    # c = randint(1,n)
-    # ind = sample(range(1,n), c)
-    # arr = ones.copy()
-    # for j in ind:
-    # arr[j] = -1
+    while len(narr)<20:
+        c = randint(1,n)
+        ind = sample(range(1,n), c)
+        arr = ones.copy()
+        for j in ind:
+            arr[j] = -1
+        # append if new one is unique
+        uni = True
+        for j in range(len(narr)):
+            if(np.array_equal(narr[j], arr)):
+                uni = False
+                break
+        if(uni==True):
+            narr.append(arr)
+    return narr
 
 class basicGA:
     opt_sol = np.empty(50, dtype = int)
-    
+    # TODO: make an init function?
+    # TODO: make a function that calls timelimit and gen_algo_basic
     def timelimit(self):
         time.sleep(45)
         print(self.opt_sol)
+        # TODO: make a proper timelimit function
         # os._exit(1)
 
     def gen_algo_basic(self,sentence):
-        # generate numpy array of 20 arrays
-        narr = np.empty([20,50], dtype = int)
+        narr = []
         best_fit = np.empty(50, dtype = int)
         fitness = np.empty(50, dtype = float)
         stagfact = 0
         # TODO: generate first 20 different random states in narr
+        narr = randomGenerate(50)
         while True:
             n=0 # number of iterations. To be used in code to check stagnation
-            newnarr = np.empty(dtype = int)
+            # newnarr = np.empty(dtype = int)
+            newnarr = []
             for i in range(20):
                 print(i)
                 x = randint(0,len(narr)-1)
@@ -82,8 +92,9 @@ class basicGA:
                     y = randint(0,len(narr)-1)
                 child = reproduce(narr[x],narr[y])
                 # append child to newnarr
-                temp = len(newnarr)
-                newnarr = np.insert(newnarr, temp, child, axis=0)
+                # temp = len(newnarr)
+                # newnarr = np.insert(newnarr, temp, child, axis=0)
+                newnarr.append(child)
             narr = newnarr.copy()
             
             for i in range(len(narr)):
@@ -96,13 +107,15 @@ class basicGA:
             n+=1
             n%=50
             # check if algo has stagnated
-            if abs(fitness[n]-fitness_func(sentence, best_fit))<=1:
-                if stagfact >=50:
+            if fitness_func(sentence, best_fit)-fitness[n] <= 5: #difference in current fitness and fitness 50 iterations ago
+                if stagfact >=50: # stagnant for past 50 iterations (assumed stagnated)
                     break
-                else:
+                else: # stagnated for a while but not enough to assign stagnated
+                    fitness[n] = fitness_func(sentence, best_fit)
                     stagfact += 1
             else:
-                stagfact = max(0, stagfact-5)
+                fitness[n] = fitness_func(sentence, best_fit)
+                stagfact = max(0, stagfact-10) # decrease stagnation factor to give more time to stagnate
         return self.opt_sol
 
 
