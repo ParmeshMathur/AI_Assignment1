@@ -75,15 +75,15 @@ class basicGA:
 
     def gen_algo_basic(self,sentence):
         narr = []
-        best_fit = np.empty(50, dtype = int)
         fitness = np.empty(50, dtype = float)
         stagfact = 0
         # TODO: generate first 20 different random states in narr
         narr = randomGenerate(50)
+        n=0 # number of iterations. To be used in code to check stagnation
         while True:
-            n=0 # number of iterations. To be used in code to check stagnation
             # newnarr = np.empty(dtype = int)
             newnarr = []
+            best_fit = np.empty(50, dtype = int)
             for i in range(20):
                 print(i)
                 x = randint(0,len(narr)-1)
