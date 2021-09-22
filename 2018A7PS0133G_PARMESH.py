@@ -77,7 +77,7 @@ class basicGA:
         narr = []
         fitness = np.empty(50, dtype = float)
         stagfact = 0
-        # TODO: generate first 20 different random states in narr
+        # generate first 20 different random states in narr
         narr = randomGenerate(50)
         n=0 # number of iterations. To be used in code to check stagnation
         while True:
