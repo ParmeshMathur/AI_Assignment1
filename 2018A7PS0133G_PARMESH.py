@@ -48,8 +48,8 @@ def randomGenerate(n):
     ones = np.ones(n, dtype=int)
     narr = []
     while len(narr)<20:
-        c = randint(1,n)
-        ind = sample(range(1,n), c)
+        c = randint(0,n)
+        ind = sample(range(n-1), c)
         arr = ones.copy()
         for j in ind:
             arr[j] = -1

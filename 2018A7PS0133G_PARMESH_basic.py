@@ -48,8 +48,8 @@ def randomGenerate(n):
     ones = np.ones(n, dtype=int)
     narr = []
     while len(narr)<20:
-        c = randint(1,n)
-        ind = sample(range(1,n), c)
+        c = randint(0,n)
+        ind = sample(range(n), c)
         arr = ones.copy()
         for j in ind:
             arr[j] = -1
@@ -85,7 +85,7 @@ class basicGA:
             newnarr = []
             best_fit = np.empty(50, dtype = int)
             for i in range(20):
-                print(i)
+                # print(i)
                 x = randint(0,len(narr)-1)
                 y = randint(0,len(narr)-1)
                 while y==x:
@@ -116,6 +116,9 @@ class basicGA:
             else:
                 fitness[n] = fitness_func(sentence, best_fit)
                 stagfact = max(0, stagfact-10) # decrease stagnation factor to give more time to stagnate
+        
+        for i in range(50):
+            self.opt_sol[i]*=(i+1)
         return self.opt_sol
 
 
@@ -124,9 +127,20 @@ def main():
     sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
     # TODO: also do for m = 160, 200, 240, 300
     print('Random sentence : ',sentence)
+    print()
+    tbegin = time.clock()
+    bga = basicGA()
+    best_sol = bga.gen_algo_basic(sentence)
+    tend = time.clock() - tbegin
+    print('Best solution model: ', best_sol)
+    print()
+    best_fitness = fitness_func(sentence, best_sol)
+    print('Fitness of model: ', best_fitness)
+    print()
+    print('Time taken: ', tend)
 
-    sentence = cnfC.ReadCNFfromCSVfile()
-    print('\nSentence from CSV file : ',sentence)
+    # sentence = cnfC.ReadCNFfromCSVfile()
+    # print('\nSentence from CSV file : ',sentence)
 
 #    print('\n\n')
 #    print('Roll No : 2020H1030999G')
