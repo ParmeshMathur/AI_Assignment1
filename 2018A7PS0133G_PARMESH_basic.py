@@ -117,8 +117,8 @@ class basicGA:
                 fitness[n] = fitness_func(sentence, best_fit)
                 stagfact = max(0, stagfact-10) # decrease stagnation factor to give more time to stagnate
         
-        for i in range(50):
-            self.opt_sol[i]*=(i+1)
+        # for i in range(50):
+        #     self.opt_sol[i]*=(i+1)
         return self.opt_sol
 
 
@@ -128,13 +128,15 @@ def main():
     # TODO: also do for m = 160, 200, 240, 300
     print('Random sentence : ',sentence)
     print()
-    tbegin = time.clock()
+    tbegin = time.perf_counter()
     bga = basicGA()
     best_sol = bga.gen_algo_basic(sentence)
-    tend = time.clock() - tbegin
+    tend = time.perf_counter() - tbegin
+    best_fitness = fitness_func(sentence, best_sol)
+    for i in range(50):
+            best_sol[i]*=(i+1)
     print('Best solution model: ', best_sol)
     print()
-    best_fitness = fitness_func(sentence, best_sol)
     print('Fitness of model: ', best_fitness)
     print()
     print('Time taken: ', tend)
