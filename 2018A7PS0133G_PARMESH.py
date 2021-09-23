@@ -49,7 +49,7 @@ def randomGenerate(n):
     narr = []
     while len(narr)<20:
         c = randint(0,n)
-        ind = sample(range(n-1), c)
+        ind = sample(range(n), c)
         arr = ones.copy()
         for j in ind:
             arr[j] = -1
@@ -84,8 +84,8 @@ class basicGA:
             # newnarr = np.empty(dtype = int)
             newnarr = []
             best_fit = np.empty(50, dtype = int)
-            for i in range(20):
-                print(i)
+            for i in range(30):
+                # print(i)
                 x = randint(0,len(narr)-1)
                 y = randint(0,len(narr)-1)
                 while y==x:
@@ -96,12 +96,18 @@ class basicGA:
                 # newnarr = np.insert(newnarr, temp, child, axis=0)
                 newnarr.append(child)
             narr = newnarr.copy()
+            narr = sorted(narr, key = lambda arr: fitness_func(sentence, arr), reverse=True)
+            narr = narr[:20]
+            if(fitness_func(sentence, narr[0]) == 100):
+                return narr[0]
+            if(fitness_func(sentence, narr[0]) > fitness_func(sentence, best_fit)):
+                best_fit = narr[0].copy()
             
-            for i in range(len(narr)):
-                if(fitness_func(sentence, narr[i]) == 100 ):
-                    return narr[i]
-                if(fitness_func(sentence, narr[i]) > fitness_func(sentence, best_fit)):
-                    best_fit = narr[i].copy()
+            # for i in range(len(narr)):
+            #     if(fitness_func(sentence, narr[i]) == 100 ):
+            #         return narr[i]
+            #     if(fitness_func(sentence, narr[i]) > fitness_func(sentence, best_fit)):
+            #         best_fit = narr[i].copy()
             if(fitness_func(sentence, best_fit) > fitness_func(sentence, self.opt_sol)):
                 self.opt_sol = best_fit.copy()
             n+=1
@@ -124,9 +130,22 @@ def main():
     sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
     # TODO: also do for m = 160, 200, 240, 300
     print('Random sentence : ',sentence)
+    print()
+    tbegin = time.perf_counter()
+    bga = basicGA()
+    best_sol = bga.gen_algo_basic(sentence)
+    tend = time.perf_counter() - tbegin
+    best_fitness = fitness_func(sentence, best_sol)
+    for i in range(50):
+            best_sol[i]*=(i+1)
+    print('Best solution model: ', best_sol)
+    print()
+    print('Fitness of model: ', best_fitness)
+    print()
+    print('Time taken: ', tend)
 
-    sentence = cnfC.ReadCNFfromCSVfile()
-    print('\nSentence from CSV file : ',sentence)
+    # sentence = cnfC.ReadCNFfromCSVfile()
+    # print('\nSentence from CSV file : ',sentence)
 
 #    print('\n\n')
 #    print('Roll No : 2020H1030999G')
