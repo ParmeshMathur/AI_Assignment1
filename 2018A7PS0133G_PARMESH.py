@@ -128,7 +128,8 @@ class basicGA:
 def main():
     cnfC = CNF_Creator(n=50) # n is number of symbols in the 3-CNF sentence
     sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
-    # TODO: also do for m = 160, 200, 240, 300
+    # TODO: also do for m = [140:300:20]
+    # TODO: plot graph for time and fitness (on notebook)
     print('Random sentence : ',sentence)
     print()
     tbegin = time.perf_counter()
