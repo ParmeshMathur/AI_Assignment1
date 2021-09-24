@@ -7,7 +7,10 @@ import time
 import sys
 import os
 import threading
+import multiprocessing
 from collections import deque
+
+optimal_solution = np.empty(50, dtype=int)
 
 def fitness_func(sentence, model):
     sat = 0
@@ -63,8 +66,63 @@ def randomGenerate(n):
             narr.append(arr)
     return narr
 
-class basicGA:
+# def gen_algo_basic(sentence):
+#     global optimal_solution
+#     optimal_solution = np.empty(50, dtype = int)
+#     narr = []
+#     fitness = np.empty(50, dtype = float)
+#     stagfact = 0
+#     # generate first 20 different random states in narr
+#     narr = randomGenerate(50)
+#     n=0 # number of iterations. To be used in code to check stagnation
+#     while True:
+#         # newnarr = np.empty(dtype = int)
+#         newnarr = []
+#         best_fit = np.empty(50, dtype = int)
+#         for i in range(30):
+#             # print(i)
+#             x = randint(0,len(narr)-1)
+#             y = randint(0,len(narr)-1)
+#             while y==x:
+#                 y = randint(0,len(narr)-1)
+#             child = reproduce(narr[x],narr[y])
+#             # append child to newnarr
+#             # temp = len(newnarr)
+#             # newnarr = np.insert(newnarr, temp, child, axis=0)
+#             newnarr.append(child)
+#         narr = newnarr.copy()
+#         narr = sorted(narr, key = lambda arr: fitness_func(sentence, arr), reverse=True)
+#         narr = narr[:20]
+#         if(fitness_func(sentence, narr[0]) == 100):
+#             optimal_solution = narr[0]
+#             break
+#         if(fitness_func(sentence, narr[0]) > fitness_func(sentence, best_fit)):
+#             best_fit = narr[0].copy()
+        
+#         # for i in range(len(narr)):
+#         #     if(fitness_func(sentence, narr[i]) == 100 ):
+#         #         return narr[i]
+#         #     if(fitness_func(sentence, narr[i]) > fitness_func(sentence, best_fit)):
+#         #         best_fit = narr[i].copy()
+#         if(fitness_func(sentence, best_fit) > fitness_func(sentence, optimal_solution)):
+#             optimal_solution = best_fit.copy()
+#         n+=1
+#         n%=50
+#         # check if algo has stagnated
+#         if fitness_func(sentence, best_fit)-fitness[n] <= 5: #difference in current fitness and fitness 50 iterations ago
+#             if stagfact >=50: # stagnant for past 50 iterations (assumed stagnated)
+#                 break
+#             else: # stagnated for a while but not enough to assign stagnated
+#                 fitness[n] = fitness_func(sentence, best_fit)
+#                 stagfact += 1
+#         else:
+#             fitness[n] = fitness_func(sentence, best_fit)
+#             stagfact = max(0, stagfact-10) # decrease stagnation factor to give more time to stagnate
+#     # return opt_sol
+
+class modifiedGA:
     opt_sol = np.empty(50, dtype = int)
+    global optimal_solution
     # TODO: make an init function?
     # TODO: make a function that calls timelimit and gen_algo_basic
     def timelimit(self):
@@ -99,7 +157,8 @@ class basicGA:
             narr = sorted(narr, key = lambda arr: fitness_func(sentence, arr), reverse=True)
             narr = narr[:20]
             if(fitness_func(sentence, narr[0]) == 100):
-                return narr[0]
+                self.opt_sol = narr[0]
+                break
             if(fitness_func(sentence, narr[0]) > fitness_func(sentence, best_fit)):
                 best_fit = narr[0].copy()
             
@@ -123,18 +182,28 @@ class basicGA:
                 fitness[n] = fitness_func(sentence, best_fit)
                 stagfact = max(0, stagfact-10) # decrease stagnation factor to give more time to stagnate
         return self.opt_sol
-
+    
+    def get_bestfit_model(self, sentence):
+        # p1 = multiprocessing.Process(target=gen_algo_basic, args=(sentence))
+        t1 = threading.Thread(target=self.gen_algo_basic, args=(sentence))
+        # p1.start()
+        t1.start()
+        # p1.join(45)
+        t1.join(45)
+        # return optimal_solution
+        return self.opt_sol
 
 def main():
     cnfC = CNF_Creator(n=50) # n is number of symbols in the 3-CNF sentence
-    sentence = cnfC.CreateRandomSentence(m=120) # m is number of clauses in the 3-CNF sentence
+    sentence = cnfC.CreateRandomSentence(m=300) # m is number of clauses in the 3-CNF sentence
     # TODO: also do for m = [140:300:20]
     # TODO: plot graph for time and fitness (on notebook)
     print('Random sentence : ',sentence)
     print()
     tbegin = time.perf_counter()
-    bga = basicGA()
-    best_sol = bga.gen_algo_basic(sentence)
+    mga = modifiedGA()
+    # best_sol = mga.get_bestfit_model(sentence)
+    best_sol = mga.gen_algo_basic(sentence)
     tend = time.perf_counter() - tbegin
     best_fitness = fitness_func(sentence, best_sol)
     for i in range(50):
