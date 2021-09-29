@@ -37,7 +37,7 @@ class CNF_Creator:
         return self._sentence
     
     def ReadCNFfromCSVfile(self):
-        with open('CNF5.csv') as csvfile:
+        with open('CNF.csv') as csvfile:
             rows = csv.reader(csvfile)
             rows = list(rows)
         sentence = [[int(i) for i in ro] for ro in rows]
@@ -82,7 +82,7 @@ def reproduce(xarr, yarr):
 def randomGenerate(n):
     ones = np.ones(n, dtype=int)
     narr = []
-    while len(narr)<40:
+    while len(narr)<30:
         c = randint(0,n)
         ind = sample(range(n), c)
         arr = ones.copy()
@@ -106,14 +106,14 @@ class modifiedGA:
         narr = []
         fitness = np.empty(50, dtype = float)
         stagfact = 0
-        # generate first 20 different random states in narr
+        # generate first 30 different random states in narr
         narr = randomGenerate(50)
         n=0 # number of iterations. To be used in code to check stagnation
 
         while True:
             newnarr = []
             best_fit = np.empty(50, dtype = int)
-            for i in range(100):
+            for i in range(50):
                 # print(i)
                 x = randint(0,len(narr)-1)
                 y = randint(0,len(narr)-1)
@@ -124,7 +124,7 @@ class modifiedGA:
                 newnarr.append(child)
             narr = newnarr.copy()
             narr = sorted(narr, key = lambda arr: fitness_func(sentence, arr), reverse=True)
-            narr = narr[:40] # sort with fitness function and choose 20 best
+            narr = narr[:30] # sort with fitness function and choose 30 best
 
             if(fitness_func(sentence, narr[0]) == 100):
                 self.opt_sol = narr[0]
